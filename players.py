@@ -71,14 +71,14 @@ def add(player):
         abort(406, f"Player with last name {lname} already exists")
 
 
-def normalize_name(lname):
+def normalize_name(lname: str):
     """
     Normalizes lname argument to be capitalized ie ("Smith")
     """
     return lname.strip().lower().capitalize()
 
 
-def read_one(lname):
+def read_one(lname: str):
     """
     Read one player from players
     """
