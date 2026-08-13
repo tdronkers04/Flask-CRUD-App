@@ -1,0 +1,17 @@
+openapi: 3.0.0
+info:
+  title: "ATP DB"
+  description: "An API ATP Player Data"
+  version: "1.0.0"
+servers:
+  - url: "/api"
+paths:
+  /players:
+    get:
+      operationId: "players.read_all"
+      tags:
+        - "Players"
+      summary: "Read the list of players"
+      responses:
+        "200":
+          description: "Successfully read players list"
