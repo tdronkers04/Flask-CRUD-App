@@ -52,10 +52,16 @@ PLAYERS = {
 
 
 def read_all():
+    """
+    Read all players in PLAYERS
+    """
     return list(PLAYERS.values())
 
 
 def add(player):
+    """
+    Add player to PLAYERS
+    """
     lname = player.get("lname")
 
     if lname and lname not in PLAYERS:
@@ -63,3 +69,22 @@ def add(player):
         return PLAYERS[lname], 201
     else:
         abort(406, f"Player with last name {lname} already exists")
+
+
+def normalize_name(lname):
+    """
+    Normalizes lname argument to be capitalized ie ("Smith")
+    """
+    return lname.strip().lower().capitalize()
+
+
+def read_one(lname):
+    """
+    Read one player from players
+    """
+    normalized_lname = normalize_name(lname)
+    print(f"normalized name: {normalized_lname}")
+    if normalized_lname in PLAYERS:
+        return PLAYERS[normalized_lname]
+    else:
+        abort(404, f"Player with last name {lname} not found")

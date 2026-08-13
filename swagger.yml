@@ -31,6 +31,14 @@ components:
           enum: [1, 2]
         timestamp:
           type: "string"
+  parameters:
+    lname:
+      name: "lname"
+      description: "Last name of the player to get"
+      in: path
+      required: True
+      schema:
+        type: "string"
 paths:
   /players:
     get:
@@ -57,3 +65,14 @@ paths:
       responses:
         "201":
           description: "Successfully added player"
+  /players/{lname}:
+    get:
+      operationId: "players.read_one"
+      tags:
+        - Players
+      summary: "Read one player"
+      parameters:
+        - $ref: "#/components/parameters/lname"
+      responses:
+        "200":
+          description: "Successfully read player"
