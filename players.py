@@ -1,5 +1,7 @@
 from datetime import datetime, timezone
 
+from flask import abort
+
 
 def get_timestamp():
     return datetime.now(tz=timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
@@ -13,7 +15,7 @@ PLAYERS = {
         "country": "USA",
         "birthplace": "Rancho Santa Fe",
         "dominant_hand": "right",
-        "backhand": "two",
+        "backhand": 2,
         "timestamp": get_timestamp(),
     },
     "Shelton": {
@@ -23,7 +25,7 @@ PLAYERS = {
         "country": "USA",
         "birthplace": "Atlanta",
         "dominant_hand": "left",
-        "backhand": "two",
+        "backhand": 2,
         "timestamp": get_timestamp(),
     },
     "Tiafoe": {
@@ -33,7 +35,7 @@ PLAYERS = {
         "country": "USA",
         "birthplace": "Hyattsville",
         "dominant_hand": "right",
-        "backhand": "two",
+        "backhand": 2,
         "timestamp": get_timestamp(),
     },
     "Paul": {
@@ -43,7 +45,7 @@ PLAYERS = {
         "country": "USA",
         "birthplace": "Voorhees",
         "dominant_hand": "right",
-        "backhand": "two",
+        "backhand": 2,
         "timestamp": get_timestamp(),
     },
 }
@@ -51,3 +53,13 @@ PLAYERS = {
 
 def read_all():
     return list(PLAYERS.values())
+
+
+def add(player):
+    lname = player.get("lname")
+
+    if lname and lname not in PLAYERS:
+        PLAYERS[lname] = {**player, "timestamp": get_timestamp()}
+        return PLAYERS[lname], 201
+    else:
+        abort(406, f"Player with last name {lname} already exists")

@@ -5,13 +5,55 @@ info:
   version: "1.0.0"
 servers:
   - url: "/api"
+components:
+  schemas:
+    Player:
+      type: "object"
+      required:
+        - fname
+        - lname
+        - country
+      properties:
+        fname:
+          type: "string"
+        lname:
+          type: "string"
+        born:
+          type: "string"
+        country:
+          type: "string"
+        birthplace:
+          type: "string"
+        dominant_hand:
+          type: "string"
+        backhand:
+          type: "integer"
+          enum: [1, 2]
+        timestamp:
+          type: "string"
 paths:
   /players:
     get:
       operationId: "players.read_all"
       tags:
-        - "Players"
+        - Players
       summary: "Read the list of players"
       responses:
         "200":
           description: "Successfully read players list"
+    post:
+      operationId: "players.add"
+      tags:
+        - Players
+      summary: "Add a player"
+      requestBody:
+        description: "Player to add"
+        required: True
+        content:
+          application/json:
+            schema:
+              x-body-name: "player"
+              $ref: "#/components/schemas/Player"
+      responses:
+        "201":
+          description: "Successfully added player"
