@@ -90,14 +90,22 @@ def read_one(lname: str):
         abort(404, f"Player with last name {lname} not found")
 
 
-def update_one(lname: str, player_update):
+def update_one(lname: str, player_update: dict):
     """
     Update one player in players
     """
     normalized_lname = normalize_name(lname)
 
-    if normalized_lname in PLAYERS:
-        PLAYERS[normalized_lname] = player_update
-        return player_update
-    else:
+    if normalized_lname != player_update.get("lname"):
+        abort(400, "lname in the request body must be capitalized")
+    elif normalized_lname not in PLAYERS:
         abort(404, f"Player with last name {lname} not found")
+
+    player_info_current = PLAYERS[normalized_lname]
+
+    PLAYERS[normalized_lname] = {
+        **player_info_current,
+        **player_update,
+        "timestamp": get_timestamp(),
+    }
+    return PLAYERS[normalized_lname]
