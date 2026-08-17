@@ -83,8 +83,21 @@ def read_one(lname: str):
     Read one player from players
     """
     normalized_lname = normalize_name(lname)
-    print(f"normalized name: {normalized_lname}")
+
     if normalized_lname in PLAYERS:
         return PLAYERS[normalized_lname]
+    else:
+        abort(404, f"Player with last name {lname} not found")
+
+
+def update_one(lname: str, player_update):
+    """
+    Update one player in players
+    """
+    normalized_lname = normalize_name(lname)
+
+    if normalized_lname in PLAYERS:
+        PLAYERS[normalized_lname] = player_update
+        return player_update
     else:
         abort(404, f"Player with last name {lname} not found")

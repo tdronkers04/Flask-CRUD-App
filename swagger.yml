@@ -76,3 +76,21 @@ paths:
       responses:
         "200":
           description: "Successfully read player"
+    put:
+      operationId: "players.update_one"
+      tags:
+        - Players
+      summary: "Update one player"
+      parameters:
+        - $ref: "#/components/parameters/lname"
+      responses:
+        "200":
+          description: "Successfully updated player"
+      requestBody:
+        description: "Player to update"
+        required: True
+        content:
+          application/json:
+            schema:
+              x-body-name: "player_update"
+              $ref: "#/components/schemas/Player"
