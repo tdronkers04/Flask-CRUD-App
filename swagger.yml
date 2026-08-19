@@ -10,9 +10,7 @@ components:
     Player:
       type: "object"
       required:
-        - fname
         - lname
-        - country
       properties:
         fname:
           type: "string"
@@ -70,7 +68,7 @@ paths:
       operationId: "players.read_one"
       tags:
         - Players
-      summary: "Read one player"
+      summary: "Read a player"
       parameters:
         - $ref: "#/components/parameters/lname"
       responses:
@@ -80,7 +78,7 @@ paths:
       operationId: "players.update_one"
       tags:
         - Players
-      summary: "Update one player"
+      summary: "Update a player"
       parameters:
         - $ref: "#/components/parameters/lname"
       responses:
@@ -94,3 +92,13 @@ paths:
             schema:
               x-body-name: "player_update"
               $ref: "#/components/schemas/Player"
+    delete:
+       operationId: "players.delete_one"
+       tags:
+         - Players
+       summary: "Delete a player"
+       parameters:
+         - $ref: "#/components/parameters/lname"
+       responses:
+         "204":
+           description: "Successfully deleted player"

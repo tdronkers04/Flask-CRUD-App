@@ -1,6 +1,6 @@
 from datetime import datetime, timezone
 
-from flask import abort
+from flask import abort, make_response
 
 
 def get_timestamp():
@@ -80,7 +80,7 @@ def normalize_name(lname: str):
 
 def read_one(lname: str):
     """
-    Read one player from players
+    Read one player from PLAYERS
     """
     normalized_lname = normalize_name(lname)
 
@@ -92,7 +92,7 @@ def read_one(lname: str):
 
 def update_one(lname: str, player_update: dict):
     """
-    Update one player in players
+    Update one player in PLAYERS
     """
     normalized_lname = normalize_name(lname)
 
@@ -109,3 +109,17 @@ def update_one(lname: str, player_update: dict):
         "timestamp": get_timestamp(),
     }
     return PLAYERS[normalized_lname]
+
+
+def delete_one(lname: str):
+    """
+    Delete one player in PLAYERS
+    """
+    normalized_lname = normalize_name(lname)
+
+    if normalized_lname not in PLAYERS:
+        abort(400, f"Player with last name {lname} not found")
+
+    del PLAYERS[normalized_lname]
+
+    return make_response(f"{lname} successfully deleted", 200)
