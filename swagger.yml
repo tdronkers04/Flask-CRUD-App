@@ -7,28 +7,68 @@ servers:
   - url: "/api"
 components:
   schemas:
-    Player:
+    PlayerBase:
       type: "object"
       required:
+        - fname
         - lname
+        - birth_date
+        - country
+        - dominant_hand
+        - backhand
       properties:
         fname:
           type: "string"
         lname:
           type: "string"
-        born:
+        birth_date:
           type: "string"
+          nullable: true
         country:
           type: "string"
-        birthplace:
-          type: "string"
+          nullable: true
         dominant_hand:
           type: "string"
+          enum: ["right", "left"]
+          nullable: true
         backhand:
           type: "integer"
           enum: [1, 2]
-        timestamp:
+          nullable: true
+    Player:
+      allOf:
+        - $ref: "#/components/schemas/PlayerBase"
+        - type: "object"
+          required:
+            - timestamp
+          properties:
+            timestamp:
+              type: "string"
+    PlayerPost:
+      allOf:
+        - $ref: "#/components/schemas/PlayerBase"
+        - type: "object"
+    PlayerUpdate:
+      type: "object"
+      properties:
+        fname:
           type: "string"
+        lname:
+          type: "string"
+        birth_date:
+          type: "string"
+          nullable: true
+        country:
+          type: "string"
+          nullable: true
+        dominant_hand:
+          type: "string"
+          enum: ["right", "left"]
+          nullable: true
+        backhand:
+          type: "integer"
+          enum: [1, 2]
+          nullable: true
   parameters:
     lname:
       name: "lname"
@@ -59,7 +99,7 @@ paths:
           application/json:
             schema:
               x-body-name: "player"
-              $ref: "#/components/schemas/Player"
+              $ref: "#/components/schemas/PlayerPost"
       responses:
         "201":
           description: "Successfully added player"
@@ -91,7 +131,7 @@ paths:
           application/json:
             schema:
               x-body-name: "player_update"
-              $ref: "#/components/schemas/Player"
+              $ref: "#/components/schemas/PlayerUpdate"
     delete:
        operationId: "players.delete_one"
        tags:

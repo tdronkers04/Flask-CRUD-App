@@ -11,9 +11,8 @@ PLAYERS = {
     "Fritz": {
         "fname": "Taylor",
         "lname": "Fritz",
-        "born": "1997-10-28",
+        "birth_date": "1997-10-28",
         "country": "USA",
-        "birthplace": "Rancho Santa Fe",
         "dominant_hand": "right",
         "backhand": 2,
         "timestamp": get_timestamp(),
@@ -21,9 +20,8 @@ PLAYERS = {
     "Shelton": {
         "fname": "Ben",
         "lname": "Shelton",
-        "born": "2002-10-09",
+        "birth_date": "2002-10-09",
         "country": "USA",
-        "birthplace": "Atlanta",
         "dominant_hand": "left",
         "backhand": 2,
         "timestamp": get_timestamp(),
@@ -31,9 +29,8 @@ PLAYERS = {
     "Tiafoe": {
         "fname": "Francis",
         "lname": "Tiafoe",
-        "born": "1998-01-20",
+        "birth_date": "1998-01-20",
         "country": "USA",
-        "birthplace": "Hyattsville",
         "dominant_hand": "right",
         "backhand": 2,
         "timestamp": get_timestamp(),
@@ -41,9 +38,8 @@ PLAYERS = {
     "Paul": {
         "fname": "Tommy",
         "lname": "Paul",
-        "born": "1997-05-17",
+        "birth_date": "1997-05-17",
         "country": "USA",
-        "birthplace": "Voorhees",
         "dominant_hand": "right",
         "backhand": 2,
         "timestamp": get_timestamp(),
@@ -63,10 +59,14 @@ def add(player):
     Add player to PLAYERS
     """
     lname = player.get("lname")
+    normalized_lname = normalize_name(lname)
 
-    if lname and lname not in PLAYERS:
-        PLAYERS[lname] = {**player, "timestamp": get_timestamp()}
-        return PLAYERS[lname], 201
+    if lname != normalized_lname:
+        abort(400, "lname in the request body must be capitalized")
+
+    if normalized_lname not in PLAYERS:
+        PLAYERS[normalized_lname] = {**player, "timestamp": get_timestamp()}
+        return PLAYERS[normalized_lname], 201
     else:
         abort(406, f"Player with last name {lname} already exists")
 
@@ -96,7 +96,7 @@ def update_one(lname: str, player_update: dict):
     """
     normalized_lname = normalize_name(lname)
 
-    if normalized_lname != player_update.get("lname"):
+    if "lname" in player_update and player_update["lname"] != normalized_lname:
         abort(400, "lname in the request body must be capitalized")
     elif normalized_lname not in PLAYERS:
         abort(404, f"Player with last name {lname} not found")
