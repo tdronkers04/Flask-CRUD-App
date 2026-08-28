@@ -87,6 +87,12 @@ paths:
       responses:
         "200":
           description: "Successfully read players list"
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/Player"
     post:
       operationId: "players.add"
       tags:
@@ -103,6 +109,10 @@ paths:
       responses:
         "201":
           description: "Successfully added player"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Player"
   /players/{lname}:
     get:
       operationId: "players.read_one"
@@ -114,6 +124,10 @@ paths:
       responses:
         "200":
           description: "Successfully read player"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Player"
     put:
       operationId: "players.update_one"
       tags:
@@ -124,6 +138,10 @@ paths:
       responses:
         "200":
           description: "Successfully updated player"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Player"
       requestBody:
         description: "Player to update"
         required: true
