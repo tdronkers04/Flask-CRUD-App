@@ -2,14 +2,23 @@
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <title>ATP DB</title>
+  <meta charset="UTF-8">
+  <title>ATP DB</title>
 </head>
+
 <body>
-    <h1>
-        Welcome to ATP DB
-    </h1>
-    <h2>Your go-to source for ATP Player Data</h2>
+  <h1>
+    Welcome to ATP DB
+  </h1>
+  <h2>Your go-to source for ATP Player Data</h2>
+  <ul>
+    {% for player in players %}
+    <li>{{ player.lname }}, {{ player.fname }}</li>
+    {% endfor %}
+  </ul>
+
 </body>
+
 </html>

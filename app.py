@@ -1,13 +1,16 @@
-import connexion
 from flask import render_template
 
-app = connexion.App(__name__, specification_dir="./")
-app.add_api("swagger.yml")
+import config
+from models import Player
+
+app = config.connexion_app
+app.add_api(config.basedir / "swagger.yml")
 
 
 @app.route("/")
 def home():
-    return render_template("home.html")
+    players = Player.query.all()
+    return render_template("home.html", players=players)
 
 
 if __name__ == "__main__":
