@@ -23,18 +23,14 @@ components:
           type: "string"
         birth_date:
           type: "string"
-          nullable: true
         country:
           type: "string"
-          nullable: true
         dominant_hand:
           type: "string"
           enum: ["right", "left"]
-          nullable: true
         backhand:
           type: "integer"
           enum: [1, 2]
-          nullable: true
     Player:
       allOf:
         - $ref: "#/components/schemas/PlayerBase"

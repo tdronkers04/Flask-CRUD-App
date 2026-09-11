@@ -24,6 +24,9 @@ def add(player):
     Add player to PLAYERS
     """
     lname = player.get("lname")
+    if not lname:
+        abort(400, "lname is required")
+
     normalized_lname = normalize_name(lname)
 
     if lname != normalized_lname:
@@ -97,7 +100,7 @@ def update_one(lname: str, player_update: dict):
     existing_player.timestamp = get_timestamp()
     db.session.commit()
 
-    return player_schema.dump(existing_player), 201
+    return player_schema.dump(existing_player), 200
 
 
 def delete_one(lname: str):

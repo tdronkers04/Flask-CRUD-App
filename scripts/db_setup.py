@@ -12,7 +12,7 @@ columns = [
     "backhand INTEGER NOT NULL CHECK (backhand IN (1, 2))",
     "timestamp TEXT NOT NULL DEFAULT (strftime('%Y-%m-%d %H:%M:%S', 'now'))",
 ]
-create_table_cmd = f"CREATE TABLE players ({','.join(columns)})"
+create_table_cmd = f"CREATE TABLE IF NOT EXISTS players ({','.join(columns)})"
 conn.execute(create_table_cmd)
 conn.commit()
 conn.close()
