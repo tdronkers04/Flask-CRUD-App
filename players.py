@@ -1,61 +1,22 @@
 from datetime import datetime, timezone
 
 from flask import abort, make_response
+from marshmallow import ValidationError
+
+from config import db
+from models import Player, player_schema, players_schema
 
 
 def get_timestamp():
     return datetime.now(tz=timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
 
 
-PLAYERS = {
-    "Fritz": {
-        "fname": "Taylor",
-        "lname": "Fritz",
-        "born": "1997-10-28",
-        "country": "USA",
-        "birthplace": "Rancho Santa Fe",
-        "dominant_hand": "right",
-        "backhand": 2,
-        "timestamp": get_timestamp(),
-    },
-    "Shelton": {
-        "fname": "Ben",
-        "lname": "Shelton",
-        "born": "2002-10-09",
-        "country": "USA",
-        "birthplace": "Atlanta",
-        "dominant_hand": "left",
-        "backhand": 2,
-        "timestamp": get_timestamp(),
-    },
-    "Tiafoe": {
-        "fname": "Francis",
-        "lname": "Tiafoe",
-        "born": "1998-01-20",
-        "country": "USA",
-        "birthplace": "Hyattsville",
-        "dominant_hand": "right",
-        "backhand": 2,
-        "timestamp": get_timestamp(),
-    },
-    "Paul": {
-        "fname": "Tommy",
-        "lname": "Paul",
-        "born": "1997-05-17",
-        "country": "USA",
-        "birthplace": "Voorhees",
-        "dominant_hand": "right",
-        "backhand": 2,
-        "timestamp": get_timestamp(),
-    },
-}
-
-
 def read_all():
     """
     Read all players in PLAYERS
     """
-    return list(PLAYERS.values())
+    players = Player.query.all()
+    return players_schema.dump(players)
 
 
 def add(player):
@@ -63,12 +24,30 @@ def add(player):
     Add player to PLAYERS
     """
     lname = player.get("lname")
+    if not lname:
+        abort(400, "lname is required")
 
-    if lname and lname not in PLAYERS:
-        PLAYERS[lname] = {**player, "timestamp": get_timestamp()}
-        return PLAYERS[lname], 201
-    else:
+    normalized_lname = normalize_name(lname)
+
+    if lname != normalized_lname:
+        abort(400, "lname in the request body must be capitalized")
+
+    existing_player = Player.query.filter(
+        Player.lname == normalized_lname
+    ).one_or_none()
+
+    if existing_player is not None:
         abort(406, f"Player with last name {lname} already exists")
+
+    try:
+        new_player = player_schema.load(player, session=db.session())
+    except ValidationError as err:
+        abort(400, err.messages)
+
+    db.session.add(new_player)
+    db.session.commit()
+
+    return player_schema.dump(new_player), 201
 
 
 def normalize_name(lname: str):
@@ -84,10 +63,12 @@ def read_one(lname: str):
     """
     normalized_lname = normalize_name(lname)
 
-    if normalized_lname in PLAYERS:
-        return PLAYERS[normalized_lname]
-    else:
+    player = Player.query.filter(Player.lname == normalized_lname).one_or_none()
+
+    if player is None:
         abort(404, f"Player with last name {lname} not found")
+
+    return player_schema.dump(player)
 
 
 def update_one(lname: str, player_update: dict):
@@ -96,19 +77,30 @@ def update_one(lname: str, player_update: dict):
     """
     normalized_lname = normalize_name(lname)
 
-    if normalized_lname != player_update.get("lname"):
+    if "lname" in player_update and player_update["lname"] != normalized_lname:
         abort(400, "lname in the request body must be capitalized")
-    elif normalized_lname not in PLAYERS:
+
+    existing_player = Player.query.filter(
+        Player.lname == normalized_lname
+    ).one_or_none()
+
+    if existing_player is None:
         abort(404, f"Player with last name {lname} not found")
 
-    player_info_current = PLAYERS[normalized_lname]
+    try:
+        player_update_validated = player_schema.load(
+            player_update, session=db.session(), partial=True
+        )
+    except ValidationError as err:
+        abort(400, err.messages)
 
-    PLAYERS[normalized_lname] = {
-        **player_info_current,
-        **player_update,
-        "timestamp": get_timestamp(),
-    }
-    return PLAYERS[normalized_lname]
+    for key in player_update:
+        setattr(existing_player, key, getattr(player_update_validated, key))
+
+    existing_player.timestamp = get_timestamp()
+    db.session.commit()
+
+    return player_schema.dump(existing_player), 200
 
 
 def delete_one(lname: str):
@@ -116,10 +108,14 @@ def delete_one(lname: str):
     Delete one player in PLAYERS
     """
     normalized_lname = normalize_name(lname)
+    existing_player = Player.query.filter(
+        Player.lname == normalized_lname
+    ).one_or_none()
 
-    if normalized_lname not in PLAYERS:
+    if existing_player is None:
         abort(400, f"Player with last name {lname} not found")
 
-    del PLAYERS[normalized_lname]
+    db.session.delete(existing_player)
+    db.session.commit()
 
     return make_response(f"{lname} successfully deleted", 200)

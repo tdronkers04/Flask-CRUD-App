@@ -7,34 +7,70 @@ servers:
   - url: "/api"
 components:
   schemas:
-    Player:
+    PlayerBase:
       type: "object"
       required:
+        - fname
         - lname
+        - birth_date
+        - country
+        - dominant_hand
+        - backhand
       properties:
         fname:
           type: "string"
         lname:
           type: "string"
-        born:
+        birth_date:
           type: "string"
         country:
           type: "string"
-        birthplace:
-          type: "string"
         dominant_hand:
           type: "string"
+          enum: ["right", "left"]
         backhand:
           type: "integer"
           enum: [1, 2]
-        timestamp:
+    Player:
+      allOf:
+        - $ref: "#/components/schemas/PlayerBase"
+        - type: "object"
+          required:
+            - timestamp
+          properties:
+            timestamp:
+              type: "string"
+    PlayerPost:
+      allOf:
+        - $ref: "#/components/schemas/PlayerBase"
+        - type: "object"
+    PlayerUpdate:
+      type: "object"
+      properties:
+        fname:
           type: "string"
+        lname:
+          type: "string"
+        birth_date:
+          type: "string"
+          nullable: true
+        country:
+          type: "string"
+          nullable: true
+        dominant_hand:
+          type: "string"
+          enum: ["right", "left"]
+          nullable: true
+        backhand:
+          type: "integer"
+          enum: [1, 2]
+          nullable: true
   parameters:
     lname:
       name: "lname"
       description: "Last name of the player to get"
       in: path
-      required: True
+      required: true
       schema:
         type: "string"
 paths:
@@ -47,6 +83,12 @@ paths:
       responses:
         "200":
           description: "Successfully read players list"
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/Player"
     post:
       operationId: "players.add"
       tags:
@@ -54,15 +96,19 @@ paths:
       summary: "Add a player"
       requestBody:
         description: "Player to add"
-        required: True
+        required: true
         content:
           application/json:
             schema:
               x-body-name: "player"
-              $ref: "#/components/schemas/Player"
+              $ref: "#/components/schemas/PlayerPost"
       responses:
         "201":
           description: "Successfully added player"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Player"
   /players/{lname}:
     get:
       operationId: "players.read_one"
@@ -74,6 +120,10 @@ paths:
       responses:
         "200":
           description: "Successfully read player"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Player"
     put:
       operationId: "players.update_one"
       tags:
@@ -84,14 +134,18 @@ paths:
       responses:
         "200":
           description: "Successfully updated player"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Player"
       requestBody:
         description: "Player to update"
-        required: True
+        required: true
         content:
           application/json:
             schema:
               x-body-name: "player_update"
-              $ref: "#/components/schemas/Player"
+              $ref: "#/components/schemas/PlayerUpdate"
     delete:
        operationId: "players.delete_one"
        tags:
